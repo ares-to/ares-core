@@ -31,7 +31,7 @@
     "rbdwllr/psr-jwt": "^1.0",
     "slim/psr7": "^0.5.0",
     "slim/slim": "^4.5.0",
-    "statical/statical": "^1.1",
+    "statical/statical": "dev-master",
     "tuupola/cors-middleware": "^1.2",
     "vlucas/phpdotenv": "^5.0@dev"
   }
