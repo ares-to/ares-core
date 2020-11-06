@@ -1,0 +1,38 @@
+{
+  "name": "domexx/ares-core",
+  "description": "Ares core framework for building web api's.",
+  "keywords": [
+    "php",
+    "slim",
+    "api"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dome",
+      "email": "dominik-forschner@web.de"
+    },
+    {
+      "name": "s1njar",
+      "email": "s1njar.mail@gmail.com"
+    }
+  ],
+  "require": {
+    "ext-json": "*",
+    "cocur/slugify": "^4.0",
+    "illuminate/database": "^9.0@dev",
+    "illuminate/pagination": "^9.0@dev",
+    "league/container": "3.3.3",
+    "monolog/monolog": "^1.24",
+    "phlak/config": "^7.0",
+    "phpfastcache/phpfastcache": "^8.0",
+    "predis/predis": "^2.0@dev",
+    "rakit/validation": "^1.4",
+    "rbdwllr/psr-jwt": "^1.0",
+    "slim/psr7": "^0.5.0",
+    "slim/slim": "^4.5.0",
+    "statical/statical": "^1.1",
+    "tuupola/cors-middleware": "^1.2",
+    "vlucas/phpdotenv": "^5.0@dev"
+  }
+}
