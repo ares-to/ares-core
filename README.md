@@ -8,7 +8,6 @@ for simply building API's on top of slim 4 framework.
 It can be used for fast creating and expanding php api's.
 
 It offers following functionality:
-r
 - Responses
 - Exceptions
 - Validation
@@ -32,7 +31,7 @@ $ composer require domexx/ares-core
 ```
 
 ## Credits
-If you got questions or feedback feel free to contact me.
+If you got questions or feedback feel free to contact us.
 
 - Discord: Dome#9999
 - Mail: dominik-forschner@web.de
