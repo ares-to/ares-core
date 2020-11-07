@@ -176,6 +176,8 @@ abstract class BaseRepository
             }
 
             $newId = $dataObjectManager->insertGetId($entity->getData(), $entity::PRIMARY_KEY);
+
+            $this->cacheService->deleteByTag($this->cacheCollectionPrefix);
             return $this->get($newId, $entity::PRIMARY_KEY, false) ?? $entity;
         } catch (\Exception $exception) {
             throw new DataObjectManagerException(
