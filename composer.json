@@ -34,5 +34,10 @@
     "statical/statical": "dev-master",
     "tuupola/cors-middleware": "^1.2",
     "vlucas/phpdotenv": "^5.0@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ares\\": "src/"
+    }
   }
 }
