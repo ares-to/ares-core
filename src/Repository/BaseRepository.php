@@ -329,7 +329,8 @@ abstract class BaseRepository
         $this->cacheService->setWithTags(
             $this->cacheCollectionPrefix . $cacheKey,
             serialize($collection),
-            $cacheTags
+            $cacheTags,
+            $this->cacheCollectionPrefix
         );
     }
 

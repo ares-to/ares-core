@@ -162,12 +162,14 @@ class CacheService
      * Sets new cache item with tags.
      *
      * @param string $key
-     * @param $value
-     * @param array $tags
-     * @param int $ttl
+     * @param        $value
+     * @param array  $tags
+     * @param string $prefix
+     * @param int    $ttl
+     *
      * @return bool
      */
-    public function setWithTags(string $key, $value, array $tags, int $ttl = 0): bool
+    public function setWithTags(string $key, $value, array $tags, string $prefix, int $ttl = 0): bool
     {
         try {
             if (!$this->isCacheEnabled()) {
@@ -180,7 +182,8 @@ class CacheService
             $cacheItem = $cacheManager
                 ->getItem($key)
                 ->set($value)
-                ->addTags($tags);
+                ->addTags($tags)
+                ->addTag($prefix);
 
             if (is_int($ttl) && $ttl <= 0) {
                 $cacheItem->expiresAt((new DateTime('@0')));
