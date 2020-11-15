@@ -149,8 +149,7 @@ abstract class BaseRepository
         DataObjectManager $dataObjectManager,
         int $pageNumber,
         int $limit
-    ): PaginatedCollection
-    {
+    ): PaginatedCollection {
         if ($limit > self::PAGINATION_DATA_LIMIT) {
             throw new DataObjectManagerException(
                 __('You cant exceed the Limit of %s', [self::PAGINATION_DATA_LIMIT])

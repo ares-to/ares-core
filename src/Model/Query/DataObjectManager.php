@@ -9,7 +9,6 @@ namespace Ares\Framework\Model\Query;
 
 use Ares\Framework\Exception\DataObjectManagerException;
 use Ares\Framework\Model\DataObject;
-use Illuminate\Database\Query\Builder;
 use ReflectionClass;
 
 /**
@@ -17,7 +16,7 @@ use ReflectionClass;
  *
  * @package Ares\Framework\Model\Query
  */
-class DataObjectManager extends Builder
+class DataObjectManager extends DataBuilder
 {
     /**
      * @var string
