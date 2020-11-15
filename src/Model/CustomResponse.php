@@ -48,15 +48,42 @@ class CustomResponse implements CustomResponseInterface
      */
     public function getJson(): string
     {
-        $response = [
+        if (!$this->exception || !$this->errors) {
+            $response = $this->getSuccessResponse();
+        } else {
+            $response = $this->getErrorResponse();
+        }
+
+        return json_encode($response);
+    }
+
+    /**
+     * Returns the success response
+     *
+     * @return array
+     */
+    private function getSuccessResponse(): array
+    {
+        return [
+            'status' => $this->getStatus(),
+            'code' => $this->getCode(),
+            'data' => $this->getData()
+        ];
+    }
+
+    /**
+     * Returns the error response
+     *
+     * @return array
+     */
+    private function getErrorResponse(): array
+    {
+        return [
             'status' => $this->getStatus(),
             'code' => $this->getCode(),
             'exception' => $this->getException(),
-            'errors' => $this->getErrors(),
-            'data' => $this->getData()
+            'errors' => $this->getErrors()
         ];
-
-        return json_encode($response);
     }
 
     /**

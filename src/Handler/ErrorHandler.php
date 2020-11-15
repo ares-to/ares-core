@@ -121,18 +121,18 @@ class ErrorHandler implements ErrorHandlerInterface
     private function addErrors(CustomResponseInterface $customResponse, Throwable $exception): CustomResponseInterface
     {
         if (!$exception instanceof BaseException) {
+            $this->addTrace($customResponse, $exception);
             return $customResponse->addError([
-                'message' => $exception->getMessage(),
-                'trace' => $exception->getTraceAsString()
+                'message' => $exception->getMessage()
             ]);
         }
 
         $errors = $exception->getErrors();
 
         if (!$errors) {
+            $this->addTrace($customResponse, $exception);
             return $customResponse->addError([
-                'message' => $exception->getMessage(),
-                'trace' => $exception->getTraceAsString()
+                'message' => $exception->getMessage()
             ]);
         }
 
@@ -141,5 +141,19 @@ class ErrorHandler implements ErrorHandlerInterface
         }
 
         return $customResponse;
+    }
+
+    /**
+     * Adds Trace of Error if API is in development mode
+     *
+     * @param CustomResponseInterface $customResponse
+     */
+    private function addTrace(CustomResponseInterface $customResponse, Throwable $exception): void
+    {
+        if ($_ENV['API_DEBUG'] === 'development') {
+            $customResponse->addError([
+                'trace' => $exception->getTraceAsString()
+            ]);
+        }
     }
 }
