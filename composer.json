@@ -20,8 +20,8 @@
   "require": {
     "ext-json": "*",
     "cocur/slugify": "^4.0",
-    "illuminate/database": "^8.14.0",
-    "illuminate/pagination": "^8.14.0",
+    "illuminate/database": "^9.0@dev",
+    "illuminate/pagination": "^9.0@dev",
     "league/container": "3.3.3",
     "monolog/monolog": "^1.24",
     "phlak/config": "^7.0",
