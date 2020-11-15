@@ -20,8 +20,8 @@
   "require": {
     "ext-json": "*",
     "cocur/slugify": "^4.0",
-    "illuminate/database": "^9.0@dev",
-    "illuminate/pagination": "^9.0@dev",
+    "illuminate/database": "^8.14.0",
+    "illuminate/pagination": "^8.14.0",
     "league/container": "3.3.3",
     "monolog/monolog": "^1.24",
     "phlak/config": "^7.0",
@@ -29,8 +29,8 @@
     "predis/predis": "^2.0@dev",
     "rakit/validation": "^1.4",
     "rbdwllr/psr-jwt": "^1.0",
-    "slim/psr7": "^0.5.0",
-    "slim/slim": "^4.5.0",
+    "slim/psr7": "^1.2.0",
+    "slim/slim": "^4.6.0",
     "statical/statical": "dev-master",
     "tuupola/cors-middleware": "^1.2",
     "vlucas/phpdotenv": "^5.0@dev"
