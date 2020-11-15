@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Repository;
@@ -45,28 +45,15 @@ abstract class BaseRepository
     protected string $cacheCollectionPrefix;
 
     /**
-     * @var DataObjectManagerFactory
-     */
-    protected DataObjectManagerFactory $dataObjectManagerFactory;
-
-    /**
-     * @var CacheService
-     */
-    protected CacheService $cacheService;
-
-    /**
      * BaseRepository constructor.
      *
      * @param DataObjectManagerFactory $dataObjectManagerFactory
      * @param CacheService             $cacheService
      */
     public function __construct(
-        DataObjectManagerFactory $dataObjectManagerFactory,
-        CacheService $cacheService
-    ) {
-        $this->dataObjectManagerFactory = $dataObjectManagerFactory;
-        $this->cacheService = $cacheService;
-    }
+        private DataObjectManagerFactory $dataObjectManagerFactory,
+        private CacheService $cacheService
+    ) {}
 
     /**
      * Get DataObject by id or by given field value pair.
@@ -80,35 +67,61 @@ abstract class BaseRepository
      * @throws NoSuchEntityException
      */
     public function get(
-        $value,
+        mixed $value,
         string $column = self::COLUMN_ID,
         bool $allowFail = false,
         bool $isCached = true
     ): ?DataObject {
         $entity = $this->cacheService->get($this->cachePrefix . $value);
 
-        try {
-            if ($entity && $isCached) {
-                return unserialize($entity);
-            }
-
-            $dataObjectManager = $this->dataObjectManagerFactory->create($this->entity);
-            $entity = $dataObjectManager->where($column, $value)->first();
-
-            if (!$entity && !$allowFail) {
-                throw new NoSuchEntityException(__('Entity not found'), 404);
-            }
-
-            $this->cacheService->set($this->cachePrefix . $value, serialize($entity));
-
-            return $entity;
-        } catch (\Exception $exception) {
-            throw new NoSuchEntityException(
-                $exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
+        if ($entity && $isCached) {
+            return unserialize($entity);
         }
+
+        $dataObjectManager = $this->dataObjectManagerFactory->create($this->entity);
+        $entity = $dataObjectManager->where($column, $value)->first();
+
+        if (!$entity && !$allowFail) {
+            throw new NoSuchEntityException(__('Entity not found'), 404);
+        }
+
+        $this->cacheService->set($this->cachePrefix . $value, serialize($entity));
+
+        return $entity;
+    }
+
+    /**
+     * Get one DataObject through a certain SearchCriteria.
+     *
+     * @param DataObjectManager $dataObjectManager
+     * @param bool              $allowFail
+     * @param bool              $isCached
+     *
+     * @return mixed
+     * @throws NoSuchEntityException
+     */
+    public function getOneBy(
+        DataObjectManager $dataObjectManager,
+        bool $allowFail = false,
+        bool $isCached = true
+    ): mixed {
+        $cacheKey = $this->getCacheKey($dataObjectManager);
+
+        $entity = $this->cacheService->get($this->cachePrefix . $cacheKey);
+
+        if ($entity && $isCached) {
+            return unserialize($entity);
+        }
+
+        $entity = $dataObjectManager->limit(1)->first();
+
+        if (!$entity && !$allowFail) {
+            throw new NoSuchEntityException(__('Entity not found'), 404);
+        }
+
+        $this->cacheService->set($this->cachePrefix . $cacheKey, serialize($entity));
+
+        return $entity;
     }
 
     /**

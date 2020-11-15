@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Middleware;
@@ -23,20 +23,13 @@ use ReallySimpleJWT\Token;
 class AuthMiddleware implements MiddlewareInterface
 {
     /**
-     * @var ResponseFactoryInterface
-     */
-    private ResponseFactoryInterface $responseFactory;
-
-    /**
      * Auth constructor.
      *
      * @param   ResponseFactoryInterface  $responseFactory
      */
     public function __construct(
-        ResponseFactoryInterface $responseFactory
-    ) {
-        $this->responseFactory = $responseFactory;
-    }
+        private ResponseFactoryInterface $responseFactory
+    ) {}
 
     /**
      * Process an incoming server request.

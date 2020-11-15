@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Handler;
@@ -25,21 +25,6 @@ use Throwable;
 class ErrorHandler implements ErrorHandlerInterface
 {
     /**
-     * @var ResponseFactoryInterface
-     */
-    private ResponseFactoryInterface $responseFactory;
-
-    /**
-     * @var CustomResponse
-     */
-    private CustomResponse $customResponse;
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
-
-    /**
      * ErrorHandler constructor.
      *
      * @param ResponseFactoryInterface $responseFactory
@@ -47,14 +32,10 @@ class ErrorHandler implements ErrorHandlerInterface
      * @param LoggerInterface          $logger
      */
     public function __construct(
-        ResponseFactoryInterface $responseFactory,
-        CustomResponse $customResponse,
-        LoggerInterface $logger
-    ) {
-        $this->responseFactory = $responseFactory;
-        $this->customResponse = $customResponse;
-        $this->logger = $logger;
-    }
+        private ResponseFactoryInterface $responseFactory,
+        private CustomResponse $customResponse,
+        private LoggerInterface $logger
+    ) {}
 
     /**
      * Catches exception and returns it in json format.
@@ -147,6 +128,7 @@ class ErrorHandler implements ErrorHandlerInterface
      * Adds Trace of Error if API is in development mode
      *
      * @param CustomResponseInterface $customResponse
+     * @param Throwable               $exception
      */
     private function addTrace(CustomResponseInterface $customResponse, Throwable $exception): void
     {

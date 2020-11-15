@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Model;
@@ -31,9 +31,9 @@ class DataObject implements JsonSerializable
     /**
      * DataObject constructor.
      *
-     * @param $data
+     * @param mixed $data
      */
-    public function __construct($data = [])
+    public function __construct(mixed $data = [])
     {
         foreach ($data as $key => &$value) {
             $this->setData($key, $value);
@@ -46,7 +46,7 @@ class DataObject implements JsonSerializable
      * @param string|null $key
      * @return mixed|array|null
      */
-    public function getData($key = null)
+    public function getData(mixed $key = null)
     {
         if (!$key) {
             return (array) $this ?? [];
@@ -63,10 +63,10 @@ class DataObject implements JsonSerializable
      * Set data by key.
      *
      * @param string $key
-     * @param $value
+     * @param mixed $value
      * @return $this
      */
-    public function setData(string $key, $value)
+    public function setData(string $key, mixed $value)
     {
         $this->{$key} = $value;
         return $this;

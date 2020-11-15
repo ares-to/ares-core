@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Service;
@@ -17,20 +17,13 @@ use Ares\Framework\Model\Locale;
 class LocaleService
 {
     /**
-     * @var Locale
-     */
-    private Locale $locale;
-
-    /**
      * LocaleService constructor.
      *
      * @param Locale $locale
      */
     public function __construct(
-        Locale $locale
-    ) {
-        $this->locale = $locale;
-    }
+        private Locale $locale
+    ) {}
 
     /**
      * Takes message and placeholder to translate them in given locale.

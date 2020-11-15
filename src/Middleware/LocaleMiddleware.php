@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Middleware;
@@ -27,20 +27,13 @@ class LocaleMiddleware implements MiddlewareInterface
     private const LOCALE_PATH_KEY = 0;
 
     /**
-     * @var Locale
-     */
-    private Locale $locale;
-
-    /**
      * LocaleMiddleware constructor.
      *
      * @param Locale $locale
      */
     public function __construct(
-        Locale $locale
-    ) {
-        $this->locale = $locale;
-    }
+        private Locale $locale
+    ) {}
 
     /**
      * Process an incoming server request.

@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Model;
@@ -39,7 +39,7 @@ class CustomResponse implements CustomResponseInterface
     /**
      * @var mixed
      */
-    private $data;
+    private mixed $data;
 
     /**
      * Returns status as json.

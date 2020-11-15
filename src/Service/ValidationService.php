@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Service;
@@ -18,11 +18,6 @@ use Rakit\Validation\Validator;
 class ValidationService
 {
     /**
-     * @var Validator
-     */
-    private Validator $validator;
-
-    /**
      * @var array $errors
      */
     private array $errors = [];
@@ -33,21 +28,19 @@ class ValidationService
      * @param Validator $validator
      */
     public function __construct(
-        Validator $validator
-    ) {
-        $this->validator = $validator;
-    }
+        private Validator $validator
+    ) {}
 
     /**
      * Validates the given data and returns an Exception if Validator fails
      *
-     * @param       $data
+     * @param mixed $data
      * @param array $rules
      *
      * @return void
      * @throws ValidationException
      */
-    public function validate($data, array $rules): void
+    public function validate(mixed $data, array $rules): void
     {
         if ($data === null || empty($rules)) {
            throw new ValidationException(__('Please provide a right data set'));
@@ -88,9 +81,9 @@ class ValidationService
     }
 
     /**
-     * @param $error
+     * @param mixed $error
      */
-    public function setErrors($error): void
+    public function setErrors(mixed $error): void
     {
         $this->errors = $error;
     }
