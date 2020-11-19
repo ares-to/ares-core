@@ -39,5 +39,7 @@
     "psr-4": {
       "Ares\\Framework\\": "src/"
     }
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
