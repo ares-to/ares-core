@@ -2,7 +2,7 @@
 /**
  * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @see LICENSE (MIT)
+ * @see       LICENSE (MIT)
  */
 
 namespace Ares\Framework\Command;
@@ -20,6 +20,9 @@ class ClearCacheCommand extends Command
 {
     /** @var string */
     private const COMMAND_NAME = 'ares:clear-cache';
+
+    /** @var string */
+    private const TMP_PATH = 'tmp';
 
     /**
      * @inheritDoc
@@ -39,11 +42,7 @@ class ClearCacheCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $isRemoved = rmdir(tmp_dir());
-
-            if (!$isRemoved) {
-                throw new \Exception('Cache directory could not be deleted, check rights or error log');
-            }
+            $this->deleteDir(self::TMP_PATH);
         } catch (\Exception $e) {
             $output->writeln('<error>' . $e->getMessage() . '</error>');
 
@@ -53,5 +52,22 @@ class ClearCacheCommand extends Command
         $output->writeln('<info>Application cache successfully cleared</info>');
 
         return 0;
+    }
+
+    /**
+     * Deletes a directory recursive
+     *
+     * @param $dir
+     *
+     * @return bool
+     */
+    private function deleteDir($dir): bool
+    {
+        if (is_dir($dir)) {
+            array_map([$this, 'deleteDir'], glob($dir . DIRECTORY_SEPARATOR . '{,.[!.]}*', GLOB_BRACE));
+            return @rmdir($dir);
+        }
+
+        return @unlink($dir);
     }
 }
