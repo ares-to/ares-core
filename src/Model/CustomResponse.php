@@ -109,9 +109,9 @@ class CustomResponse implements CustomResponseInterface
     }
 
     /**
-     * @return int
+     * @return int|string
      */
-    public function getCode(): int
+    public function getCode(): int|string
     {
         if (!$this->code) {
             return 200;
@@ -121,10 +121,11 @@ class CustomResponse implements CustomResponseInterface
     }
 
     /**
-     * @param int $code
+     * @param int|string $code
+     *
      * @return CustomResponseInterface
      */
-    public function setCode(int $code): CustomResponseInterface
+    public function setCode(int|string $code): CustomResponseInterface
     {
         $this->code = $code;
         return $this;
@@ -177,7 +178,7 @@ class CustomResponse implements CustomResponseInterface
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): mixed
     {
         if (!$this->data) {
             return [];
@@ -188,9 +189,10 @@ class CustomResponse implements CustomResponseInterface
 
     /**
      * @param mixed $data
+     *
      * @return CustomResponseInterface
      */
-    public function setData($data): CustomResponseInterface
+    public function setData(mixed $data): CustomResponseInterface
     {
         $this->data = $data;
         return $this;

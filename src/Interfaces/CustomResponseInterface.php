@@ -31,15 +31,16 @@ interface CustomResponseInterface
     public function setStatus(string $status): CustomResponseInterface;
 
     /**
-     * @return int
+     * @return int|string
      */
-    public function getCode(): int;
+    public function getCode(): int|string;
 
     /**
-     * @param int $code
+     * @param int|string $code
+     *
      * @return CustomResponseInterface
      */
-    public function setCode(int $code): CustomResponseInterface;
+    public function setCode(int|string $code): CustomResponseInterface;
 
     /**
      * @return string
@@ -66,11 +67,12 @@ interface CustomResponseInterface
     /**
      * @return mixed
      */
-    public function getData();
+    public function getData(): mixed;
 
     /**
      * @param mixed $data
+     *
      * @return CustomResponseInterface
      */
-    public function setData($data): CustomResponseInterface;
+    public function setData(mixed $data): CustomResponseInterface;
 }
