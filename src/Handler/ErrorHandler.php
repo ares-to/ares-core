@@ -8,6 +8,7 @@
 namespace Ares\Framework\Handler;
 
 use Ares\Framework\Exception\BaseException;
+use Ares\Framework\Interfaces\CustomResponseCodeInterface;
 use Ares\Framework\Interfaces\CustomResponseInterface;
 use Ares\Framework\Model\CustomResponse as CustomResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -54,7 +55,7 @@ class ErrorHandler implements ErrorHandlerInterface
         bool $logErrors,
         bool $logErrorDetails
     ): ResponseInterface {
-        $statusCode = $exception->getCode() ?: 500;
+        $statusCode = $exception->getCode() ?: CustomResponseCodeInterface::RESPONSE_UNKNOWN_ERROR;
 
         $customResponse = response()
             ->setStatus('error')
@@ -66,11 +67,7 @@ class ErrorHandler implements ErrorHandlerInterface
         $response = $this->responseFactory->createResponse();
         $response->getBody()->write($customResponse->getJson());
 
-        try {
-            $response = $response->withStatus($exception->getCode());
-        } catch (\Exception $exception) {
-            $response = $response->withStatus(500);
-        }
+        $response = $this->withStatus($response, $exception);
 
         /** @var \Exception $exception */
         $this->logger->error($exception);
@@ -92,6 +89,25 @@ class ErrorHandler implements ErrorHandlerInterface
             ->withHeader('Access-Control-Allow-Origin', $_ENV['WEB_FRONTEND_LINK'])
             ->withHeader('Access-Control-Allow-Credentials', 'true')
             ->withHeader("Content-Type", "application/problem+json");
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @param Throwable         $exception
+     *
+     * @return ResponseInterface
+     */
+    private function withStatus(ResponseInterface $response, Throwable $exception): ResponseInterface
+    {
+        try {
+            if ($_ENV['API_DEBUG'] == 'development') {
+                return $response->withStatus($exception->getCode());
+            } else {
+                return $response->withStatus(CustomResponseCodeInterface::RESPONSE_OK);
+            }
+        } catch (\Exception) {
+            return $response->withStatus(CustomResponseCodeInterface::RESPONSE_UNKNOWN_ERROR);
+        }
     }
 
     /**

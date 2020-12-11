@@ -7,6 +7,7 @@
 
 namespace Ares\Framework\Model;
 
+use Ares\Framework\Interfaces\CustomResponseCodeInterface;
 use Ares\Framework\Interfaces\CustomResponseInterface;
 
 /**
@@ -114,7 +115,7 @@ class CustomResponse implements CustomResponseInterface
     public function getCode(): int|string
     {
         if (!$this->code) {
-            return 200;
+            return CustomResponseCodeInterface::RESPONSE_OK;
         }
 
         return $this->code;

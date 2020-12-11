@@ -8,6 +8,7 @@
 namespace Ares\Framework\Middleware;
 
 use Ares\Framework\Exception\ThrottleException;
+use Ares\Framework\Interfaces\CustomResponseCodeInterface;
 use Predis\Client as Predis;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -68,7 +69,10 @@ class ThrottleMiddleware implements MiddlewareInterface
         }
 
         if ($this->hasExceededRateLimit()) {
-            throw new ThrottleException('There was an issue with your request, try again', 429);
+            throw new ThrottleException(
+                'There was an issue with your request, try again',
+                CustomResponseCodeInterface::RESPONSE_RATE_LIMIT_ERROR
+            );
         }
 
         $this->incrementRequestCount();

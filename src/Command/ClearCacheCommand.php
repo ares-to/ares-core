@@ -7,6 +7,7 @@
 
 namespace Ares\Framework\Command;
 
+use Predis\Client;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,6 +24,20 @@ class ClearCacheCommand extends Command
 
     /** @var string */
     private const TMP_PATH = 'tmp';
+
+    /** @var string */
+    private const CACHE_TYPE = 'Predis';
+
+    /**
+     * ClearCacheCommand constructor.
+     *
+     * @param Client $client
+     */
+    public function __construct(
+        private Client $client
+    ) {
+        parent::__construct();
+    }
 
     /**
      * @inheritDoc
@@ -42,7 +57,7 @@ class ClearCacheCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->deleteDir(self::TMP_PATH);
+            $this->deleteCache(self::TMP_PATH);
         } catch (\Exception $e) {
             $output->writeln('<error>' . $e->getMessage() . '</error>');
 
@@ -55,14 +70,19 @@ class ClearCacheCommand extends Command
     }
 
     /**
-     * Deletes a directory recursive
+     * Deletes the cache recursive
      *
      * @param $dir
      *
      * @return bool
      */
-    private function deleteDir($dir): bool
+    private function deleteCache($dir): bool
     {
+        if ($_ENV['CACHE_TYPE'] == self::CACHE_TYPE) {
+            $this->client->flushall();
+            return true;
+        }
+
         if (is_dir($dir)) {
             array_map([$this, 'deleteDir'], glob($dir . DIRECTORY_SEPARATOR . '{,.[!.]}*', GLOB_BRACE));
             return @rmdir($dir);
