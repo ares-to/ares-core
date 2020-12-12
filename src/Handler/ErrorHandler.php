@@ -10,6 +10,7 @@ namespace Ares\Framework\Handler;
 use Ares\Framework\Exception\BaseException;
 use Ares\Framework\Interfaces\CustomResponseCodeInterface;
 use Ares\Framework\Interfaces\CustomResponseInterface;
+use Ares\Framework\Interfaces\HttpResponseCodeInterface;
 use Ares\Framework\Model\CustomResponse as CustomResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -55,7 +56,11 @@ class ErrorHandler implements ErrorHandlerInterface
         bool $logErrors,
         bool $logErrorDetails
     ): ResponseInterface {
-        $statusCode = $exception->getCode() ?: CustomResponseCodeInterface::RESPONSE_SERVER_ERROR;
+        if (!$exception instanceof BaseException) {
+            $statusCode = $exception->getCode() ?: HttpResponseCodeInterface::HTTP_RESPONSE_INTERNAL_SERVER_ERROR;
+        } else {
+            $statusCode = $exception->getCustomCode() ?: CustomResponseCodeInterface::RESPONSE_UNKNOWN_ERROR;
+        }
 
         $customResponse = response()
             ->setStatus('error')
@@ -88,25 +93,25 @@ class ErrorHandler implements ErrorHandlerInterface
         return $response
             ->withHeader('Access-Control-Allow-Origin', $_ENV['WEB_FRONTEND_LINK'])
             ->withHeader('Access-Control-Allow-Credentials', 'true')
-            ->withHeader("Content-Type", "application/problem+json");
+            ->withHeader("Content-Type", "application/json");
     }
 
     /**
-     * @param ResponseInterface $response
-     * @param Throwable         $exception
+     * @param ResponseInterface       $response
+     * @param Throwable|BaseException $exception
      *
      * @return ResponseInterface
      */
-    private function withStatus(ResponseInterface $response, Throwable $exception): ResponseInterface
+    private function withStatus(ResponseInterface $response, Throwable|BaseException $exception): ResponseInterface
     {
         try {
             if ($_ENV['API_DEBUG'] == 'development') {
-                return $response->withStatus(CustomResponseCodeInterface::RESPONSE_SERVER_ERROR);
+                return $response->withStatus($exception->getCode());
             } else {
-                return $response->withStatus(CustomResponseCodeInterface::RESPONSE_OK);
+                return $response->withStatus(HttpResponseCodeInterface::HTTP_RESPONSE_OK);
             }
         } catch (\Exception) {
-            return $response->withStatus(CustomResponseCodeInterface::RESPONSE_SERVER_ERROR);
+            return $response->withStatus(HttpResponseCodeInterface::HTTP_RESPONSE_INTERNAL_SERVER_ERROR);
         }
     }
 
