@@ -29,17 +29,6 @@ class ClearCacheCommand extends Command
     private const CACHE_TYPE = 'Predis';
 
     /**
-     * ClearCacheCommand constructor.
-     *
-     * @param Client $client
-     */
-    public function __construct(
-        private Client $client
-    ) {
-        parent::__construct();
-    }
-
-    /**
      * @inheritDoc
      */
     protected function configure()
@@ -78,8 +67,11 @@ class ClearCacheCommand extends Command
      */
     private function deleteCache($dir): bool
     {
+        /** @var Client $predisClient */
+        $predisClient = container()->get(Client::class);
+
         if ($_ENV['CACHE_TYPE'] == self::CACHE_TYPE) {
-            $this->client->flushall();
+            $predisClient->flushall();
             return true;
         }
 

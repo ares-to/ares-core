@@ -55,7 +55,7 @@ class ErrorHandler implements ErrorHandlerInterface
         bool $logErrors,
         bool $logErrorDetails
     ): ResponseInterface {
-        $statusCode = $exception->getCode() ?: CustomResponseCodeInterface::RESPONSE_UNKNOWN_ERROR;
+        $statusCode = $exception->getCode() ?: CustomResponseCodeInterface::RESPONSE_SERVER_ERROR;
 
         $customResponse = response()
             ->setStatus('error')
@@ -101,12 +101,12 @@ class ErrorHandler implements ErrorHandlerInterface
     {
         try {
             if ($_ENV['API_DEBUG'] == 'development') {
-                return $response->withStatus($exception->getCode());
+                return $response->withStatus(CustomResponseCodeInterface::RESPONSE_SERVER_ERROR);
             } else {
                 return $response->withStatus(CustomResponseCodeInterface::RESPONSE_OK);
             }
         } catch (\Exception) {
-            return $response->withStatus(CustomResponseCodeInterface::RESPONSE_UNKNOWN_ERROR);
+            return $response->withStatus(CustomResponseCodeInterface::RESPONSE_SERVER_ERROR);
         }
     }
 
