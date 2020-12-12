@@ -8,6 +8,8 @@
 namespace Ares\Framework\Middleware;
 
 use Ares\Framework\Exception\AuthenticationException;
+use Ares\Framework\Interfaces\CustomResponseCodeInterface;
+use Ares\Framework\Interfaces\HttpResponseCodeInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -51,7 +53,11 @@ class AuthMiddleware implements MiddlewareInterface
                 ->createResponse()
                 ->withHeader('Content-Type', 'application/problem+json');
 
-            throw new AuthenticationException(__('You arent allowed to visit this site'), 401);
+            throw new AuthenticationException(
+                __('You arent allowed to visit this site'),
+                CustomResponseCodeInterface::RESPONSE_NOT_ALLOWED,
+                HttpResponseCodeInterface::HTTP_RESPONSE_UNAUTHORIZED
+            );
         }
 
         return $handler->handle($request);
