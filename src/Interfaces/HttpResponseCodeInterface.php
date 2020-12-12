@@ -135,6 +135,9 @@ interface HttpResponseCodeInterface
     public const HTTP_RESPONSE_MISDIRECTED_REQUEST = 421;
 
     /** @var int */
+    public const HTTP_RESPONSE_UNPROCESSABLE_ENTITY = 422;
+
+    /** @var int */
     public const HTTP_RESPONSE_UPGRADE_REQUIRED = 426;
 
     /** @var int */
