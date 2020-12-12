@@ -76,7 +76,7 @@ class ClearCacheCommand extends Command
         }
 
         if (is_dir($dir)) {
-            array_map([$this, 'deleteDir'], glob($dir . DIRECTORY_SEPARATOR . '{,.[!.]}*', GLOB_BRACE));
+            array_map([$this, 'deleteCache'], glob($dir . DIRECTORY_SEPARATOR . '{,.[!.]}*', GLOB_BRACE));
             return @rmdir($dir);
         }
 
