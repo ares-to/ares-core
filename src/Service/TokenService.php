@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Service;
@@ -20,11 +20,11 @@ class TokenService
     /**
      * Creates the JWT - Token and returns it
      *
-     * @param $id
+     * @param mixed $id
      * @return string
      * @throws ValidateException
      */
-    public function execute($id): string
+    public function execute(mixed $id): string
     {
         $payload = [
             'iat' => time(),

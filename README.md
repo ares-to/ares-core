@@ -27,7 +27,7 @@ It offers following functionality:
 
 ##### 1. Require Composer Package
 ```console
-$ composer require domexx/ares-core
+$ composer require ares/ares-core
 ```
 
 ## Credits

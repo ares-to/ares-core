@@ -1,18 +1,19 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Repository;
 
 use Ares\Framework\Exception\DataObjectManagerException;
+use Ares\Framework\Exception\NoSuchEntityException;
 use Ares\Framework\Factory\DataObjectManagerFactory;
 use Ares\Framework\Model\DataObject;
 use Ares\Framework\Model\Query\DataObjectManager;
+use Ares\Framework\Model\Query\PaginatedCollection;
 use Ares\Framework\Service\CacheService;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Ares\Framework\Model\Query\Collection;
 
 /**
@@ -44,40 +45,33 @@ abstract class BaseRepository
     protected string $cacheCollectionPrefix;
 
     /**
-     * @var DataObjectManagerFactory
-     */
-    protected DataObjectManagerFactory $dataObjectManagerFactory;
-
-    /**
-     * @var CacheService
-     */
-    protected CacheService $cacheService;
-
-    /**
      * BaseRepository constructor.
      *
      * @param DataObjectManagerFactory $dataObjectManagerFactory
-     * @param CacheService $cacheService
+     * @param CacheService             $cacheService
      */
     public function __construct(
-        DataObjectManagerFactory $dataObjectManagerFactory,
-        CacheService $cacheService
-    ) {
-        $this->dataObjectManagerFactory = $dataObjectManagerFactory;
-        $this->cacheService = $cacheService;
-    }
+        private DataObjectManagerFactory $dataObjectManagerFactory,
+        private CacheService $cacheService
+    ) {}
 
     /**
      * Get DataObject by id or by given field value pair.
      *
-     * @param mixed $value
+     * @param mixed  $value
      * @param string $column
+     * @param bool   $allowFail
+     * @param bool   $isCached
      *
-     * @param bool $isCached
      * @return DataObject|null
+     * @throws NoSuchEntityException
      */
-    public function get($value, string $column = self::COLUMN_ID, bool $isCached = true): ?DataObject
-    {
+    public function get(
+        mixed $value,
+        string $column = self::COLUMN_ID,
+        bool $allowFail = false,
+        bool $isCached = true
+    ): ?DataObject {
         $entity = $this->cacheService->get($this->cachePrefix . $value);
 
         if ($entity && $isCached) {
@@ -87,7 +81,45 @@ abstract class BaseRepository
         $dataObjectManager = $this->dataObjectManagerFactory->create($this->entity);
         $entity = $dataObjectManager->where($column, $value)->first();
 
+        if (!$entity && !$allowFail) {
+            throw new NoSuchEntityException(__('Entity not found'), 404);
+        }
+
         $this->cacheService->set($this->cachePrefix . $value, serialize($entity));
+
+        return $entity;
+    }
+
+    /**
+     * Get one DataObject through a certain SearchCriteria.
+     *
+     * @param DataObjectManager $dataObjectManager
+     * @param bool              $allowFail
+     * @param bool              $isCached
+     *
+     * @return mixed
+     * @throws NoSuchEntityException
+     */
+    public function getOneBy(
+        DataObjectManager $dataObjectManager,
+        bool $allowFail = false,
+        bool $isCached = true
+    ): mixed {
+        $cacheKey = $this->getCacheKey($dataObjectManager);
+
+        $entity = $this->cacheService->get($this->cachePrefix . $cacheKey);
+
+        if ($entity && $isCached) {
+            return unserialize($entity);
+        }
+
+        $entity = $dataObjectManager->limit(1)->first();
+
+        if (!$entity && !$allowFail) {
+            throw new NoSuchEntityException(__('Entity not found'), 404);
+        }
+
+        $this->cacheService->set($this->cachePrefix . $cacheKey, serialize($entity));
 
         return $entity;
     }
@@ -97,7 +129,6 @@ abstract class BaseRepository
      *
      * @param DataObjectManager $dataObjectManager
      * @param bool              $isCached
-     *
      * @return Collection
      */
     public function getList(DataObjectManager $dataObjectManager, bool $isCached = true): Collection
@@ -121,22 +152,24 @@ abstract class BaseRepository
      * Get paginated list of data objects by build search.
      *
      * @param DataObjectManager $dataObjectManager
-     * @param int $pageNumber
-     * @param int $limit
-     * @return LengthAwarePaginator
+     * @param int               $pageNumber
+     * @param int               $limit
+     *
+     * @return PaginatedCollection
+     * @throws DataObjectManagerException
      */
     public function getPaginatedList(
         DataObjectManager $dataObjectManager,
         int $pageNumber,
         int $limit
-    ): LengthAwarePaginator {
+    ): PaginatedCollection {
         if ($limit > self::PAGINATION_DATA_LIMIT) {
             throw new DataObjectManagerException(
                 __('You cant exceed the Limit of %s', [self::PAGINATION_DATA_LIMIT])
             );
         }
 
-        $cacheKey = $this->getCacheKey($dataObjectManager, (string) $pageNumber, (string) $limit);
+        $cacheKey = $this->getCacheKey($dataObjectManager, (string)$pageNumber, (string)$limit);
 
         $collection = $this->cacheService->get($this->cacheCollectionPrefix . $cacheKey);
 
@@ -172,13 +205,13 @@ abstract class BaseRepository
 
                 $this->cacheService->deleteByTag($id);
 
-                return $this->get($entity->getId(), $entity::PRIMARY_KEY, false) ?? $entity;
+                return $this->get($entity->getId(), $entity::PRIMARY_KEY, true, false) ?? $entity;
             }
 
             $newId = $dataObjectManager->insertGetId($entity->getData(), $entity::PRIMARY_KEY);
 
             $this->cacheService->deleteByTag($this->cacheCollectionPrefix);
-            return $this->get($newId, $entity::PRIMARY_KEY, false) ?? $entity;
+            return $this->get($newId, $entity::PRIMARY_KEY, true, false) ?? $entity;
         } catch (\Exception $exception) {
             throw new DataObjectManagerException(
                 $exception->getMessage(),
@@ -200,7 +233,7 @@ abstract class BaseRepository
         $dataObjectManager = $this->dataObjectManagerFactory->create($this->entity);
 
         try {
-            $deleted = (bool) $dataObjectManager->delete($id);
+            $deleted = (bool)$dataObjectManager->delete($id);
 
             if (!$deleted) {
                 return false;
@@ -222,21 +255,21 @@ abstract class BaseRepository
      * Returns one to one relation.
      *
      * @param BaseRepository $repository
-     * @param int|null $id
-     * @param string $column
+     * @param int|null       $id
+     * @param string         $column
      * @return DataObject|null
      */
     public function getOneToOne(BaseRepository $repository, ?int $id, string $column): ?DataObject
     {
-        return $repository->get($id, $column);
+        return $repository->get($id, $column, true, true);
     }
 
     /**
      * Returns one to many relation.
      *
      * @param BaseRepository $repository
-     * @param int $id
-     * @param string $column
+     * @param int            $id
+     * @param string         $column
      * @return Collection
      */
     public function getOneToMany(BaseRepository $repository, int $id, string $column): Collection
@@ -250,10 +283,10 @@ abstract class BaseRepository
      * Returns many to many relation.
      *
      * @param BaseRepository $repository
-     * @param int $id
-     * @param string $pivotTable
-     * @param string $primaryPivotColumn
-     * @param string $foreignPivotColumn
+     * @param int            $id
+     * @param string         $pivotTable
+     * @param string         $primaryPivotColumn
+     * @param string         $foreignPivotColumn
      * @return Collection
      */
     public function getManyToMany(
@@ -262,7 +295,8 @@ abstract class BaseRepository
         string $pivotTable,
         string $primaryPivotColumn,
         string $foreignPivotColumn
-    ): Collection {
+    ): Collection
+    {
         $primaryTable = $this->entity::TABLE;
         $primaryTableColumn = $this->entity::PRIMARY_KEY;
         $foreignTable = $repository->getEntity()::TABLE;
@@ -291,7 +325,7 @@ abstract class BaseRepository
      * Generates cache key.
      *
      * @param DataObjectManager $dataObjectManager
-     * @param string ...$postfix
+     * @param string            ...$postfix
      * @return string
      */
     protected function getCacheKey(DataObjectManager $dataObjectManager, string ...$postfix): string
@@ -307,8 +341,8 @@ abstract class BaseRepository
     /**
      * Caches collection and its items.
      *
-     * @param string $cacheKey
-     * @param Collection|LengthAwarePaginator $collection
+     * @param string                         $cacheKey
+     * @param Collection|PaginatedCollection $collection
      * @return void
      */
     private function cacheCollection(string $cacheKey, $collection): void
@@ -319,7 +353,7 @@ abstract class BaseRepository
         foreach ($collection as &$item) {
             $cacheItem = clone $item;
 
-            $cacheTags[] = (string) $item->getData($item::PRIMARY_KEY);
+            $cacheTags[] = (string)$item->getData($item::PRIMARY_KEY);
             $this->cacheService->set(
                 $this->cachePrefix . $item->getData($item::PRIMARY_KEY),
                 serialize($cacheItem->clearRelations())
@@ -336,7 +370,6 @@ abstract class BaseRepository
 
     /**
      * Returns data object manager.
-     *
      * @return DataObjectManager
      */
     public function getDataObjectManager(): DataObjectManager
@@ -346,7 +379,6 @@ abstract class BaseRepository
 
     /**
      * Returns entity of repository.
-     *
      * @return string
      */
     public function getEntity(): string

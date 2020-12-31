@@ -1,13 +1,15 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Middleware;
 
 use Ares\Framework\Exception\ThrottleException;
+use Ares\Framework\Interfaces\CustomResponseCodeInterface;
+use Ares\Framework\Interfaces\HttpResponseCodeInterface;
 use Predis\Client as Predis;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -42,20 +44,13 @@ class ThrottleMiddleware implements MiddlewareInterface
     private string $storageKey = 'rate:%s:requests';
 
     /**
-     * @var Predis
-     */
-    private Predis $predis;
-
-    /**
      * ThrottleMiddleware constructor.
      *
      * @param Predis $predis
      */
     public function __construct(
-        Predis $predis
-    ) {
-        $this->predis = $predis;
-    }
+        private Predis $predis
+    ) {}
 
     /**
      * Process an incoming server request.
@@ -75,7 +70,11 @@ class ThrottleMiddleware implements MiddlewareInterface
         }
 
         if ($this->hasExceededRateLimit()) {
-            throw new ThrottleException('There was an issue with your request, try again', 429);
+            throw new ThrottleException(
+                'There was an issue with your request, try again',
+                CustomResponseCodeInterface::RESPONSE_THROTTLE_ERROR,
+                HttpResponseCodeInterface::HTTP_RESPONSE_TOO_MANY_REQUESTS
+            );
         }
 
         $this->incrementRequestCount();
@@ -107,12 +106,12 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Set the limitations.
      *
-     * @param integer $requests
-     * @param integer $perSecond
+     * @param int $requests
+     * @param int $perSecond
      *
      * @return $this
      */
-    public function setRateLimit($requests, $perSecond): self
+    public function setRateLimit(int $requests, int $perSecond): self
     {
         $this->requests = $requests;
         $this->perSecond = $perSecond;

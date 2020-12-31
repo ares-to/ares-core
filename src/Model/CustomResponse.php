@@ -1,13 +1,14 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Model;
 
 use Ares\Framework\Interfaces\CustomResponseInterface;
+use Ares\Framework\Interfaces\HttpResponseCodeInterface;
 
 /**
  * Class Response
@@ -39,7 +40,7 @@ class CustomResponse implements CustomResponseInterface
     /**
      * @var mixed
      */
-    private $data;
+    private mixed $data;
 
     /**
      * Returns status as json.
@@ -48,15 +49,42 @@ class CustomResponse implements CustomResponseInterface
      */
     public function getJson(): string
     {
-        $response = [
+        if (!$this->exception || !$this->errors) {
+            $response = $this->getSuccessResponse();
+        } else {
+            $response = $this->getErrorResponse();
+        }
+
+        return json_encode($response);
+    }
+
+    /**
+     * Returns the success response
+     *
+     * @return array
+     */
+    private function getSuccessResponse(): array
+    {
+        return [
+            'status' => $this->getStatus(),
+            'code' => $this->getCode(),
+            'data' => $this->getData()
+        ];
+    }
+
+    /**
+     * Returns the error response
+     *
+     * @return array
+     */
+    private function getErrorResponse(): array
+    {
+        return [
             'status' => $this->getStatus(),
             'code' => $this->getCode(),
             'exception' => $this->getException(),
-            'errors' => $this->getErrors(),
-            'data' => $this->getData()
+            'errors' => $this->getErrors()
         ];
-
-        return json_encode($response);
     }
 
     /**
@@ -82,22 +110,23 @@ class CustomResponse implements CustomResponseInterface
     }
 
     /**
-     * @return int
+     * @return int|string
      */
-    public function getCode(): int
+    public function getCode(): int|string
     {
         if (!$this->code) {
-            return 200;
+            return HttpResponseCodeInterface::HTTP_RESPONSE_OK;
         }
 
         return $this->code;
     }
 
     /**
-     * @param int $code
+     * @param int|string $code
+     *
      * @return CustomResponseInterface
      */
-    public function setCode(int $code): CustomResponseInterface
+    public function setCode(int|string $code): CustomResponseInterface
     {
         $this->code = $code;
         return $this;
@@ -150,7 +179,7 @@ class CustomResponse implements CustomResponseInterface
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): mixed
     {
         if (!$this->data) {
             return [];
@@ -161,9 +190,10 @@ class CustomResponse implements CustomResponseInterface
 
     /**
      * @param mixed $data
+     *
      * @return CustomResponseInterface
      */
-    public function setData($data): CustomResponseInterface
+    public function setData(mixed $data): CustomResponseInterface
     {
         $this->data = $data;
         return $this;

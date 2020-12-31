@@ -8,10 +8,10 @@
 namespace Ares\Framework\Exception;
 
 /**
- * Class AuthenticationException
+ * Class NoSuchEntityException
  *
  * @package Ares\Framework\Exception
  */
-class AuthenticationException extends BaseException
+class NoSuchEntityException extends BaseException
 {
 }

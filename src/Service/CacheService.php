@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Service;
@@ -23,28 +23,15 @@ use Psr\Log\LoggerInterface;
 class CacheService
 {
     /**
-     * @var FastCache
-     */
-    private FastCache $fastCache;
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
-
-    /**
      * CacheService constructor.
      *
      * @param FastCache $fastCache
      * @param LoggerInterface $logger
      */
     public function __construct(
-        FastCache $fastCache,
-        LoggerInterface $logger
-    ) {
-        $this->fastCache = $fastCache;
-        $this->logger = $logger;
-    }
+        private FastCache $fastCache,
+        private LoggerInterface $logger
+    ) {}
 
     /**
      * Checks whether cache is set or not.
@@ -73,7 +60,7 @@ class CacheService
      * @param string $key
      * @return  mixed
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         try {
             if (!$this->has($key) || !$this->isCacheEnabled()) {
@@ -98,7 +85,7 @@ class CacheService
      * @param int $ttl
      * @return bool
      */
-    public function set(string $key, $value, int $ttl = 0): bool
+    public function set(string $key, mixed $value, int $ttl = 0): bool
     {
         try {
             if (!$this->isCacheEnabled()) {
@@ -137,7 +124,7 @@ class CacheService
     }
 
     /**
-     * Cleares cache.
+     * Clears cache.
      *
      * @return bool
      */
@@ -162,14 +149,14 @@ class CacheService
      * Sets new cache item with tags.
      *
      * @param string $key
-     * @param        $value
+     * @param mixed  $value
      * @param array  $tags
      * @param string $prefix
      * @param int    $ttl
      *
      * @return bool
      */
-    public function setWithTags(string $key, $value, array $tags, string $prefix, int $ttl = 0): bool
+    public function setWithTags(string $key, mixed $value, array $tags, string $prefix, int $ttl = 0): bool
     {
         try {
             if (!$this->isCacheEnabled()) {

@@ -1,8 +1,8 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Model;
@@ -37,20 +37,13 @@ class Locale
     private array $fallbackMessages = [];
 
     /**
-     * @var LocaleHelper
-     */
-    private LocaleHelper $localeHelper;
-
-    /**
      * Locale constructor.
      *
      * @param LocaleHelper $localeHelper
      */
     public function __construct(
-        LocaleHelper $localeHelper
-    ) {
-        $this->localeHelper = $localeHelper;
-    }
+        private LocaleHelper $localeHelper
+    ) {}
 
     /**
      * Takes message and placeholder to translate them in given locale.

@@ -1,13 +1,15 @@
 <?php
 /**
- * Ares (https://ares.to)
+ * @copyright Copyright (c) Ares (https://www.ares.to)
  *
- * @license https://gitlab.com/arescms/ares-backend/LICENSE (MIT License)
+ * @see LICENSE (MIT)
  */
 
 namespace Ares\Framework\Middleware;
 
 use Ares\Framework\Exception\AuthenticationException;
+use Ares\Framework\Interfaces\CustomResponseCodeInterface;
+use Ares\Framework\Interfaces\HttpResponseCodeInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,20 +25,13 @@ use ReallySimpleJWT\Token;
 class AuthMiddleware implements MiddlewareInterface
 {
     /**
-     * @var ResponseFactoryInterface
-     */
-    private ResponseFactoryInterface $responseFactory;
-
-    /**
      * Auth constructor.
      *
      * @param   ResponseFactoryInterface  $responseFactory
      */
     public function __construct(
-        ResponseFactoryInterface $responseFactory
-    ) {
-        $this->responseFactory = $responseFactory;
-    }
+        private ResponseFactoryInterface $responseFactory
+    ) {}
 
     /**
      * Process an incoming server request.
@@ -58,7 +53,11 @@ class AuthMiddleware implements MiddlewareInterface
                 ->createResponse()
                 ->withHeader('Content-Type', 'application/problem+json');
 
-            throw new AuthenticationException(__('You arent allowed to visit this site'), 401);
+            throw new AuthenticationException(
+                __('You arent allowed to visit this site'),
+                CustomResponseCodeInterface::RESPONSE_NOT_ALLOWED,
+                HttpResponseCodeInterface::HTTP_RESPONSE_UNAUTHORIZED
+            );
         }
 
         return $handler->handle($request);
