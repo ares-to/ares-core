@@ -1,5 +1,5 @@
 {
-  "name": "ares/ares-core",
+  "name": "ares-legacy/ares-core",
   "description": "Ares core framework for building web api's.",
   "keywords": [
     "php",
