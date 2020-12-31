@@ -27,7 +27,7 @@ It offers following functionality:
 
 ##### 1. Require Composer Package
 ```console
-$ composer require ares/ares-core
+$ composer require ares-legacy/ares-core
 ```
 
 ## Credits
